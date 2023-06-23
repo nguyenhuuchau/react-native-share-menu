@@ -1,42 +1,33 @@
-import { NativeModules, NativeEventEmitter } from "react-native";
+import { NativeModules, NativeEventEmitter, Platform } from "react-native";
 
-const { ShareMenu } = NativeModules;
-
-const EventEmitter = new NativeEventEmitter(ShareMenu);
+// const EventEmitter = new NativeEventEmitter(ShareMenu);
 
 const NEW_SHARE_EVENT_NAME = "NewShareEvent";
+const ShareMenuReactView = Platform.OS == "ios" ? NativeModules.ShareMenuReactView : NativeModules.ShareMenu
 
-export const ShareMenuReactView = {
-  dismissExtension(error = null) {
-    NativeModules.ShareMenuReactView.dismissExtension(error);
-  },
-  openApp() {
-    NativeModules.ShareMenuReactView.openApp();
-  },
-  continueInApp(extraData = null) {
-    NativeModules.ShareMenuReactView.continueInApp(extraData);
-  },
-  data() {
-    return NativeModules.ShareMenuReactView.data();
-  },
-};
 
 export default {
   /**
    * @deprecated Use `getInitialShare` instead. This is here for backwards compatibility.
    */
-  getSharedText(callback) {
-    this.getInitialShare(callback);
+  dismissExtension(error = null) {
+    ShareMenuReactView.dismissExtension(error);
   },
-  getInitialShare(callback) {
-    ShareMenu.getSharedText(callback);
+  openApp() {
+    ShareMenuReactView.openApp();
   },
-  addNewShareListener(callback) {
-    const subscription = EventEmitter.addListener(
-      NEW_SHARE_EVENT_NAME,
-      callback
-    );
+  continueInApp(extraData = null) {
+    ShareMenuReactView.continueInApp(extraData);
+  },
+  data() {
+    return ShareMenuReactView.data();
+  },
+  // addNewShareListener(callback) {
+  //   const subscription = EventEmitter.addListener(
+  //     NEW_SHARE_EVENT_NAME,
+  //     callback
+  //   );
 
-    return subscription;
-  },
+  //   return subscription;
+  // },
 };

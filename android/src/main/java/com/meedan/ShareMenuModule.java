@@ -20,6 +20,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import java.util.ArrayList;
+import com.facebook.react.bridge.Promise;
 
 public class ShareMenuModule extends ReactContextBaseJavaModule implements ActivityEventListener {
 
@@ -84,8 +85,7 @@ public class ShareMenuModule extends ReactContextBaseJavaModule implements Activ
     return null;
   }
 
-  @ReactMethod
-  public void getSharedText(Callback successCallback) {
+  public void getSharedText(Promise promise) {
     Activity currentActivity = getCurrentActivity();
 
     if (currentActivity == null) {
@@ -99,7 +99,7 @@ public class ShareMenuModule extends ReactContextBaseJavaModule implements Activ
       currentActivity.startActivity(newIntent);
 
       ReadableMap shared = extractShared(newIntent);
-      successCallback.invoke(shared);
+      promise.resolve(shared);
       clearSharedText();
       currentActivity.finish();
       return;
@@ -108,7 +108,7 @@ public class ShareMenuModule extends ReactContextBaseJavaModule implements Activ
     Intent intent = currentActivity.getIntent();
     
     ReadableMap shared = extractShared(intent);
-    successCallback.invoke(shared);
+    promise.resolve(shared);
     clearSharedText();
   }
 
@@ -162,5 +162,27 @@ public class ShareMenuModule extends ReactContextBaseJavaModule implements Activ
 
     // Update intent in case the user calls `getSharedText` again
     currentActivity.setIntent(intent);
+  }
+  @ReactMethod
+  public void data(Promise promise) {
+    getSharedText(promise);
+  }
+
+  @ReactMethod
+  public void continueInApp(ReadableMap readableMap) {
+    ShareActivity currentActivity = (ShareActivity)getCurrentActivity();
+    currentActivity.continueInApp(readableMap);
+  }
+
+  @ReactMethod
+  public void openApp() {
+    ShareActivity currentActivity = (ShareActivity)getCurrentActivity();
+    currentActivity.openApp();
+  }
+
+  @ReactMethod
+  public void dismissExtension(String error) {
+    ShareActivity currentActivity = (ShareActivity)getCurrentActivity();
+    currentActivity.dismissExtension(error);
   }
 }
